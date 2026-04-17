@@ -276,7 +276,6 @@
     background-size: contain;
   }
 
-  /* ── Elective dropdown styles ── */
   .elective-card {
     background: rgba(139,92,246,.05);
     border: 1px solid rgba(139,92,246,.2);
@@ -285,10 +284,7 @@
     margin-top: 12px;
     animation: fadeUp .3s ease both;
   }
-  .elective-card label {
-    color: var(--accent2);
-    font-size: 12px;
-  }
+  .elective-card label { color: var(--accent2); font-size: 12px; }
   .elective-mentor-badge {
     display: inline-flex; align-items: center; gap: 8px;
     background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.25);
@@ -359,7 +355,6 @@
     <span>⚙️</span>
     <div>
       <strong>Google Sheets Setup Required:</strong> Replace the value of <code>SHEET_SCRIPT_URL</code> at the top of the &lt;script&gt; with your Google Apps Script Web App URL to enable live data sync.
-      <a href="#setup-guide" style="color:#b45309; margin-left:6px; text-decoration:underline; text-underline-offset:3px;">See guide below ↓</a>
     </div>
   </div>
 
@@ -419,7 +414,7 @@
             <option value="S-VYASA University">S-VYASA University</option>
             <option value="Asian School of Business">Asian School of Business</option>
             <option value="Alliance University">Alliance University</option>
-            <option value="Kristu Jayathi University">Kristu Jayathi University</option>
+            <option value="Kristu Jayanti (Deemed to be University)">Kristu Jayanti (Deemed to be University)</option>
           </select>
         </div>
       </div>
@@ -598,31 +593,6 @@
 
   </form>
 
-  <!-- SETUP GUIDE -->
-  <div id="setup-guide" class="section" style="margin-top:48px; animation-delay:.7s;">
-    <div class="section-title">
-      <div class="icon icon-gold">📊</div>
-      Google Sheets Integration — Setup Guide
-    </div>
-    <div style="color:var(--muted); font-size:14px; line-height:1.9;">
-      <p><strong style="color:var(--text);">Step 1.</strong> Open <a href="https://sheets.google.com" target="_blank" style="color:var(--accent);">Google Sheets</a> and create a new spreadsheet.</p>
-      <p><strong style="color:var(--text);">Step 2.</strong> Go to <strong style="color:var(--text);">Extensions → Apps Script</strong>.</p>
-      <p><strong style="color:var(--text);">Step 3.</strong> Paste the following code into the editor and click <strong style="color:var(--text);">Save</strong>:</p>
-      <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:18px;font-family:monospace;font-size:12px;color:#475569;overflow-x:auto;margin:12px 0;line-height:1.7;">function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  if (sheet.getLastRow() === 0) { sheet.appendRow(Object.keys(data)); }
-  sheet.appendRow(Object.values(data));
-  return ContentService
-    .createTextOutput(JSON.stringify({ result: "success" }))
-    .setMimeType(ContentService.MimeType.JSON);
-}</pre>
-      <p><strong style="color:var(--text);">Step 4.</strong> Click <strong style="color:var(--text);">Deploy → New deployment → Web App</strong>.</p>
-      <p><strong style="color:var(--text);">Step 5.</strong> Set <em>Execute as</em>: <strong style="color:var(--text);">Me</strong> and <em>Who has access</em>: <strong style="color:var(--text);">Anyone</strong>. Click Deploy.</p>
-      <p><strong style="color:var(--text);">Step 6.</strong> Copy the Web App URL and paste it as the value of <code style="background:var(--surface2);padding:2px 7px;border-radius:4px;color:#b45309;">SHEET_SCRIPT_URL</code> inside the &lt;script&gt; tag.</p>
-    </div>
-  </div>
-
 </div>
 
 <div id="toast"></div>
@@ -631,16 +601,19 @@
   // ─────────────────────────────────────────────
   //  🔧 REPLACE THIS with your Apps Script URL
   // ─────────────────────────────────────────────
-  const SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZR9TN1ai32M9ixzHJH_7WdSLSfjIAJSM6YAfZPeHrjYOhb00rMfx5pumkOOl1sZqo/exec";
+  const SHEET_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
   // ─────────────────────────────────────────────
 
-  const MENTOR_RUBRICS = ["Concept clarity", "Engagement level", "Practical/industry relevance", "Doubt resolution", "Preparedness"];
+  // The 5 rubric criteria — used for calculating the average
+  const MENTOR_RUBRICS = [
+    "Concept clarity",
+    "Engagement level",
+    "Practical/industry relevance",
+    "Doubt resolution",
+    "Preparedness"
+  ];
 
-  // ── S-VYASA Elective definitions ──
-  // Each elective subject has an array of options; each option has a label and mentor.
-  // Non-elective subjects are plain { subject, mentor } objects.
-  // Elective subjects use { subject, isElective: true, electiveOptions: [{label, mentor}] }
-
+  // ── COLLEGE DATA ──
   const COLLEGE_DATA = {
     "Kamaraj College": {
       "I BCA - A": [
@@ -1184,7 +1157,6 @@
       ]
     },
 
-    // ── S-VYASA University (with Elective subjects) ──
     "S-VYASA University": {
       "II BCA": [
         { subject: "Full Stack Web Development", mentor: "Mr. Neeraj" },
@@ -1282,7 +1254,7 @@
       ]
     },
 
-    "Kristu Jayathi University": {
+    "Kristu Jayanti (Deemed to be University)": {
       "BBA - AI & DS": [
         { subject: "Optimising User Engagement in Business Systems", mentor: "Ishika Bhattacharjee" },
         { subject: "Supervised and Unsupervised Learning in Management", mentor: "Anwesha" },
@@ -1368,10 +1340,8 @@
       sec.style.animationDelay = `${0.2 + index * 0.05}s`;
 
       if (subjectData.isElective) {
-        // ── ELECTIVE subject card ──
         sec.innerHTML = buildElectiveSection(subjectData, index);
       } else {
-        // ── Normal subject card ──
         sec.innerHTML = buildMentorSection(subjectData, index);
       }
 
@@ -1412,7 +1382,6 @@
   }
 
   function buildElectiveSection(electiveData, index) {
-    // Build options list for the dropdown
     const optionsHtml = electiveData.electiveOptions.map((opt, oi) =>
       `<option value="${oi}" data-mentor="${opt.mentor}">${opt.label}</option>`
     ).join('');
@@ -1456,7 +1425,6 @@
       html += `<tr><td>${rub}</td>`;
       for (let v = 1; v <= 5; v++) {
         const id = `m${index + 1}r${ri}v${v}`;
-        // Note: not required here — will be toggled required via JS when visible
         html += `<td><input type="radio" id="${id}" name="mentor${index + 1}_${safeRub}" value="${v}" class="elective-rating-${index}"><label for="${id}" class="r-label">${v}</label></td>`;
       }
       html += `</tr>`;
@@ -1466,23 +1434,19 @@
     return html;
   }
 
-  // Called when student picks an elective from dropdown
   function handleElectiveChange(selectEl, index) {
     const chosen = selectEl.options[selectEl.selectedIndex];
     const mentor = chosen.getAttribute('data-mentor');
     const subjectLabel = chosen.textContent;
 
-    // Update mentor display + hidden fields
     document.getElementById(`electiveMentorName${index}`).textContent = mentor;
     document.getElementById(`electiveMentorHidden${index}`).value = mentor;
     document.getElementById(`electiveSubjectName${index}`).value = subjectLabel;
 
-    // Show the rating section
     const detail = document.getElementById(`electiveDetail${index}`);
     detail.style.display = 'block';
     detail.style.animation = 'fadeUp 0.3s ease both';
 
-    // Make rating radios required
     document.querySelectorAll(`.elective-rating-${index}`).forEach(r => {
       r.required = true;
     });
@@ -1532,6 +1496,11 @@
   }
 
   // ── Submit ──
+  // What gets sent to Google Sheets per subject:
+  //   subject{N}_Name        → subject name
+  //   subject{N}_Mentor      → mentor name
+  //   subject{N}_Rating      → average of 5 rubric scores (2 decimal places) — HIGHLIGHTED IN GREEN
+
   document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const btn = document.getElementById('submitBtn');
@@ -1539,58 +1508,81 @@
     btn.innerHTML = '<span>Submitting…</span><span>⏳</span>';
 
     const fd = new FormData(this);
+
+    // ── Base fields ──
     const data = {
-      timestamp: new Date().toISOString(),
-      studentName: fd.get('studentName'),
-      registerNumber: fd.get('regNumber'),
-      studentEmail: fd.get('studentEmail'),
-      collegeName: fd.get('collegeName'),
-      department: fd.get('department'),
-      regularAssessments: fd.get('assessments'),
+      timestamp:              new Date().toISOString(),
+      studentName:            fd.get('studentName'),
+      registerNumber:         fd.get('regNumber'),
+      studentEmail:           fd.get('studentEmail'),
+      collegeName:            fd.get('collegeName'),
+      department:             fd.get('department'),
+      regularAssessments:     fd.get('assessments'),
       studyMaterialsReceived: fd.get('studyMaterials'),
-      missingStudyMaterials: fd.get('missingMaterials') || '',
-      curriculumRating: fd.get('curriculumRating'),
-      confidenceRating: fd.get('confidenceRating'),
-      infraNPS: fd.get('infraNPS'),
-      infraChallenges: fd.get('infraChallenges'),
-      trainingNPS: fd.get('trainingNPS'),
-      challenges: fd.getAll('challenges').join('; '),
-      challengeDetail: fd.get('challengeDetail'),
-      suggestions: fd.get('suggestions'),
+      missingStudyMaterials:  fd.get('missingMaterials') || '',
+      curriculumRating:       fd.get('curriculumRating'),
+      confidenceRating:       fd.get('confidenceRating'),
+      infraNPS:               fd.get('infraNPS'),
+      infraChallenges:        fd.get('infraChallenges'),
+      trainingNPS:            fd.get('trainingNPS'),
+      challenges:             fd.getAll('challenges').join('; '),
+      challengeDetail:        fd.get('challengeDetail'),
+      suggestions:            fd.get('suggestions'),
     };
 
-    const college = fd.get('collegeName');
+    // ── Per-subject: name, mentor, average rating only ──
+    const college    = fd.get('collegeName');
     const department = fd.get('department');
+
     if (COLLEGE_DATA[college] && COLLEGE_DATA[college][department]) {
       COLLEGE_DATA[college][department].forEach((subjectData, index) => {
-        const mentorNum = index + 1;
+        const n = index + 1;
+        let subjectName, mentorName;
+
         if (subjectData.isElective) {
-          data[`subject${mentorNum}`] = fd.get(`elective${mentorNum}Choice`)
-            ? document.getElementById(`electiveSubjectName${index}`).value
-            : subjectData.subject;
-          data[`mentor${mentorNum}Name`] = fd.get(`mentor${mentorNum}Name`) || '';
+          subjectName = document.getElementById(`electiveSubjectName${index}`).value || subjectData.subject;
+          mentorName  = fd.get(`mentor${n}Name`) || '';
         } else {
-          data[`subject${mentorNum}`] = subjectData.subject;
-          data[`mentor${mentorNum}Name`] = subjectData.mentor;
+          subjectName = subjectData.subject;
+          mentorName  = subjectData.mentor;
         }
-        MENTOR_RUBRICS.forEach(rub => {
-          const key = rub.replace(/\s+/g,'').replace(/[^a-zA-Z]/g,'');
-          data[`mentor${mentorNum}_${key}`] = fd.get(`mentor${mentorNum}_${key}`) || '';
+
+        // Subject name & mentor
+        data[`subject${n}_Name`]   = subjectName;
+        data[`subject${n}_Mentor`] = mentorName;
+
+        // Calculate average of 5 rubric scores
+        const scores = [];
+        MENTOR_RUBRICS.forEach((rub) => {
+          const safeKey = rub.replace(/\s+/g,'').replace(/[^a-zA-Z]/g,'');
+          const raw     = fd.get(`mentor${n}_${safeKey}`);
+          const score   = raw ? parseInt(raw, 10) : 0;
+          scores.push(score);
         });
+
+        // Average of answered rubrics only
+        const answered = scores.filter(s => s > 0);
+        data[`subject${n}_Rating`] = answered.length
+          ? (answered.reduce((a, b) => a + b, 0) / answered.length).toFixed(2)
+          : '0.00';
       });
     }
 
+    // ── Demo mode ──
     if (SHEET_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
-      console.log("Form Data (demo):", data);
+      console.log("Form Data (demo — columns that will be sent to Sheets):");
+      console.table(data);
       showToast("Demo mode: data logged to console. Add your Apps Script URL to enable Sheets sync.");
       btn.disabled = false;
       btn.innerHTML = '<span>Submit Feedback</span><span>→</span>';
       return;
     }
 
+    // ── Live submit ──
     try {
       await fetch(SHEET_SCRIPT_URL, {
-        method: 'POST', mode: 'no-cors',
+        method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
