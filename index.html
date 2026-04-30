@@ -179,55 +179,101 @@
   .rating-block {
     background: rgba(59,130,246,.04);
     border: 1px solid rgba(59,130,246,.15);
-    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
-    display: flex; flex-direction: column; gap: 10px;
+    border-radius: 10px; padding: 14px 18px 18px; margin-bottom: 16px;
+    display: flex; flex-direction: column; gap: 14px;
   }
   .rating-block-title {
     font-size: 12px; font-weight: 700; color: var(--text);
     letter-spacing: .01em; text-transform: uppercase;
   }
-  .scale-circle-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .s-circle-label { font-size: 10px; font-weight: 500; color: var(--muted); text-align: center; line-height: 1.2; }
-  .scale-btns { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+
+  /* Scale container — needs enough height for the lifted selected circle */
+  .scale-btns {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    align-items: flex-end; padding-bottom: 4px;
+  }
   .scale-btns input[type="radio"] { display: none; }
+
+  .scale-circle-wrap {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+
+  /* The circle label */
   .scale-btns label {
-    width: 40px; height: 40px;
-    display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; border: 2px solid transparent;
-    cursor: pointer; transition: all .2s; margin: 0;
+    width: 44px; height: 44px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+    border-radius: 50%; border: 2.5px solid transparent;
+    cursor: pointer; transition: all 0.22s cubic-bezier(.34,1.56,.64,1); margin: 0;
     text-transform: none; letter-spacing: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,.13);
-    opacity: 1; transform: scale(1);
+    position: relative;
   }
   .scale-btns label .s-num {
-    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800;
-    line-height: 1; color: #fff;
+    font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800;
+    line-height: 1; color: #fff; transition: font-size 0.2s;
   }
-  .scale-btns label .s-word { display: none; }
+  .scale-btns label .s-word {
+    font-family: 'DM Sans', sans-serif; font-size: 0px; font-weight: 600;
+    color: #fff; line-height: 1; white-space: nowrap;
+    overflow: hidden; transition: font-size 0.18s ease;
+  }
 
-  /* Individual colors */
+  /* Per-circle colours */
   .scale-btns label[data-v="1"] { background: #e53935; }
   .scale-btns label[data-v="2"] { background: #f57c00; }
   .scale-btns label[data-v="3"] { background: #fdd835; }
-  .scale-btns label[data-v="3"] .s-num { color: #555; }
+  .scale-btns label[data-v="3"] .s-num  { color: #555; }
+  .scale-btns label[data-v="3"] .s-word { color: #555; }
   .scale-btns label[data-v="4"] { background: #43a047; }
   .scale-btns label[data-v="5"] { background: #2e7d32; }
 
-  .scale-btns label:hover { opacity: 0.75; transform: scale(0.95); }
+  /* Bottom word label */
+  .s-circle-label {
+    font-size: 10px; font-weight: 500; color: var(--muted);
+    text-align: center; line-height: 1.2;
+    transition: opacity 0.2s, font-weight 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
 
-  .scale-btns input[type="radio"]:checked + label {
-    opacity: 1; transform: scale(1.12);
-    border-color: rgba(255,255,255,0.85);
-    box-shadow: 0 4px 14px rgba(0,0,0,.22);
+  /* ── NO SELECTION: hover shrinks slightly ── */
+  .scale-btns:not(.has-selection) label:hover {
+    opacity: 0.78; transform: scale(0.92) translateY(-3px);
+  }
+
+  /* ── AFTER SELECTION: shrink & fade all ── */
+  .scale-btns.has-selection label {
+    width: 30px; height: 30px; opacity: 0.32;
+  }
+  .scale-btns.has-selection label .s-num { font-size: 12px; }
+  .scale-btns.has-selection .s-circle-label { opacity: 0.28; }
+
+  /* ── SELECTED circle: grow big, lift, show word ── */
+  .scale-btns.has-selection input[type="radio"]:checked + label {
+    width: 70px; height: 70px; opacity: 1;
+    border-color: rgba(255,255,255,0.88);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    transform: translateY(-10px);
+  }
+  .scale-btns.has-selection input[type="radio"]:checked + label .s-num { font-size: 24px; }
+  .scale-btns.has-selection input[type="radio"]:checked + label .s-word { font-size: 10px; }
+
+  /* selected word label below circle */
+  .scale-btns.has-selection input[type="radio"]:checked ~ .s-circle-label {
+    opacity: 1 !important;
+    font-weight: 600;
+    color: var(--text);
   }
 
   .rating-block.error-rating { border-color: var(--error); background: rgba(239,68,68,.04); }
+
   @media (max-width: 640px) {
-    .rating-block { padding: 10px 14px; gap: 8px; }
-    .scale-btns { gap: 8px; }
-    .scale-btns label { width: 34px; height: 34px; }
-    .scale-btns label .s-num { font-size: 13px; }
+    .rating-block { padding: 10px 14px 14px; gap: 10px; }
+    .scale-btns { gap: 10px; }
+    .scale-btns label { width: 36px; height: 36px; }
+    .scale-btns label .s-num { font-size: 14px; }
     .s-circle-label { font-size: 9px; }
+    .scale-btns.has-selection input[type="radio"]:checked + label { width: 58px; height: 58px; }
+    .scale-btns.has-selection input[type="radio"]:checked + label .s-num { font-size: 20px; }
+    .scale-btns.has-selection input[type="radio"]:checked + label .s-word { font-size: 9px; }
   }
 
   /* ── ELECTIVE ── */
@@ -845,14 +891,17 @@ function buildScaleHtml(n) {
   for (let v = 1; v <= 5; v++) {
     btns += `<div class="scale-circle-wrap">
       <input type="radio" id="sr${n}v${v}" name="s${n}_rating" value="${v}" required>
-      <label for="sr${n}v${v}" data-v="${v}"><span class="s-num">${v}</span></label>
+      <label for="sr${n}v${v}" data-v="${v}">
+        <span class="s-num">${v}</span>
+        <span class="s-word">${SCALE_WORDS[v]}</span>
+      </label>
       <div class="s-circle-label">${SCALE_WORDS[v]}</div>
     </div>`;
   }
   return `<div class="rating-block" id="ratingBlock${n}">
     <div class="rating-block-title">Overall Rating</div>
-    <div class="scale-btns">${btns}</div>
-    <div class="error-message" style="margin-top:8px;">Please select a rating</div>
+    <div class="scale-btns" id="scaleBtns${n}">${btns}</div>
+    <div class="error-message" style="margin-top:4px;">Please select a rating</div>
   </div>`;
 }
 
@@ -950,7 +999,6 @@ function handleElective(sel, n) {
 function validateForm() {
   let valid = true, first = null;
 
-  // Personal fields
   document.querySelectorAll('#feedbackForm .field').forEach(field => {
     const inp = field.querySelector('input:not([type="radio"]):not([type="hidden"]), select');
     if (!inp) return;
@@ -962,13 +1010,11 @@ function validateForm() {
     else field.classList.remove('error');
   });
 
-  // Radio groups (yn questions + rating scale)
   const college = document.getElementById('collegeName').value;
   const dept = document.getElementById('department').value;
   if (college && dept && COLLEGE_DATA[college] && COLLEGE_DATA[college][dept]) {
     COLLEGE_DATA[college][dept].forEach((sub, idx) => {
       const n = idx + 1;
-      // rating scale
       const ratingBlock = document.getElementById(`ratingBlock${n}`);
       if (ratingBlock && ratingBlock.offsetParent !== null) {
         const ratingAnswered = document.querySelector(`[name="s${n}_rating"]:checked`);
@@ -977,7 +1023,6 @@ function validateForm() {
           if (!first) first = ratingBlock;
         } else ratingBlock.classList.remove('error-rating');
       }
-      // yn questions
       QUESTIONS.forEach((_, qi) => {
         const name = `s${n}_q${qi}`;
         const row = document.getElementById(`yn_${n}_${qi}`);
@@ -998,11 +1043,17 @@ function validateForm() {
 }
 
 document.addEventListener('change', e => {
+  // Rating scale — add has-selection class to animate
+  if (e.target.type === 'radio' && e.target.name && e.target.name.endsWith('_rating')) {
+    const scaleBtns = e.target.closest('.scale-btns');
+    if (scaleBtns) scaleBtns.classList.add('has-selection');
+    const rb = e.target.closest('.rating-block');
+    if (rb) rb.classList.remove('error-rating');
+  }
+
   if (e.target.type === 'radio') {
     const row = e.target.closest('.yn-row');
     if (row) row.classList.remove('error-row');
-    const rb = e.target.closest('.rating-block');
-    if (rb) rb.classList.remove('error-rating');
   }
   const field = e.target.closest('.field');
   if (field && field.classList.contains('error')) field.classList.remove('error');
